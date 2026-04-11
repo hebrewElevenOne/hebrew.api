@@ -26,7 +26,7 @@ jobs:
 
       - name: Terraform Init
         working-directory: ./terraform 
-        run: terraform init -backend-config="hebrewsapp-497162053259-ap-southeast-1-an"
+        run: terraform init -backend-config="bucket=hebrewsapp-497162053259-ap-southeast-1-an"
 
       - name: Terraform Plan & Apply
         working-directory: ./terraform 
