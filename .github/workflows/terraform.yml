@@ -25,8 +25,10 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
+        working-directory: ./terraform 
         run: terraform init -backend-config="hebrewsapp-497162053259-ap-southeast-1-an"
 
       - name: Terraform Plan & Apply
+        working-directory: ./terraform 
         run: terraform apply -auto-approve
 
