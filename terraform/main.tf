@@ -57,4 +57,26 @@ resource "aws_db_instance" "postgres" {
   publicly_accessible  = false
   skip_final_snapshot  = true
 }
+# Inside your main.tf App Runner resource
+instance_configuration {
+  instance_role_arn = aws_iam_role.apprunner_role.arn
+}
+
+source_configuration {
+  authentication_configuration {
+    connection_arn = aws_apprunner_connection.github.arn
+  }
+  code_repository {
+    code_configuration {
+      configuration_source = "API"
+      code_configuration_values {
+        runtime = "DOTNET_8"
+        port    = "8080"
+        runtime_environment_variables = {
+          "ConnectionStrings__DefaultConnection" = "Host=${aws_db_instance.postgres.address};Port=5432;Database=${aws_db_instance.postgres.db_name};Username=adminuser;Password=${var.db_password};"
+        }
+      }
+    }
+  }
+}
 
