@@ -19,6 +19,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }} # The ARN from Step 3
           aws-region: ap-southeast-1 # Philippines/Singapore region
+          audience: sts.amazonaws.com 
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
