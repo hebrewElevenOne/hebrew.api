@@ -1,8 +1,10 @@
 # The Public URL of your .NET API (for React Native)
 output "api_public_url" {
-  description = "The public endpoint for your ECS Express Service"
-  value       = aws_ecs_express_gateway_service.api.service_url
+  description = "The public URL for the Hebrew API service"
+  # access the first ingress path's endpoint
+  value       = aws_ecs_express_gateway_service.api.ingress_paths[0].endpoint
 }
+
 
 # The Database Address (for your records)
 output "db_endpoint" {
