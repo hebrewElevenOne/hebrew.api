@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket         = "sideline-terraform-state-bucket"
+    bucket         = "hebrewsapp-497162053259-ap-southeast-1-an"
     key            = "dev/terraform.tfstate" # Path inside the bucket
     region         = "ap-southeast-1"
     encrypt        = true
