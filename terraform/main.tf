@@ -58,16 +58,7 @@ resource "aws_db_instance" "postgres" {
   skip_final_snapshot  = true
 }
 
-# Inside your main.tf App Runner resource
-resource "aws_apprunner_service" "api" {
-  service_name = "hebrew-api"
 
-  # THIS block belongs here
-  instance_configuration {
-    cpu    = "0.25 vCPU"
-    memory = "0.5 GB"
-    # instance_role_arn = aws_iam_role.apprunner_role.arn (Uncomment if you have the role)
-  }
 
   # THIS block belongs here
   source_configuration {
@@ -95,20 +86,65 @@ resource "aws_apprunner_service" "api" {
     }
   }
 
-  network_configuration {
-    egress_configuration {
-      egress_type       = "VPC"
-      vpc_connector_arn = aws_apprunner_vpc_connector.connector.arn
+# IAM Role for Task Execution (Pulls the image from ECR)
+resource "aws_iam_role" "ecs_execution_role" {
+  name = "hebrew-api-execution-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = { Service = "://amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "execution_policy" {
+  role       = aws_iam_role.ecs_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+# IAM Role for Infrastructure (Manages the network/load balancer)
+resource "aws_iam_role" "ecs_infrastructure_role" {
+  name = "hebrew-api-infra-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = { Service = "://amazonaws.com" }
+    }]
+  })
+}
+
+# ECR Repo to store your Docker images
+resource "aws_ecr_repository" "api" {
+  name                 = "hebrew-api"
+  force_delete         = true
+}
+
+# The ECS Express Service (Replaces App Runner)
+resource "aws_ecs_express_gateway_service" "api" {
+  name                    = "hebrew-api"
+  execution_role_arn       = aws_iam_role.ecs_execution_role.arn
+  infrastructure_role_arn  = aws_iam_role.ecs_infrastructure_role.arn
+  
+  # Connects to your existing VPC subnets
+  subnet_ids         = [aws_subnet.public_a.id]
+  security_group_ids = [aws_security_group.rds_sg.id] 
+
+  primary_container {
+    image          = "${aws_ecr_repository.api.repository_url}:latest"
+    container_port = 8080
+    
+    environment {
+      name  = "ConnectionStrings__DefaultConnection"
+      value = "Host=${aws_db_instance.postgres.address};Port=5432;Database=${aws_db_instance.postgres.db_name};Username=adminuser;Password=${var.db_password};"
     }
   }
 }
 
-# Create the VPC Connector
-resource "aws_apprunner_vpc_connector" "connector" {
-  vpc_connector_name = "sideline-vpc-connector"
-  subnets            = [aws_subnet.private_a.id, aws_subnet.private_b.id]
-  security_groups    = [aws_security_group.rds_sg.id] # Reuse rds_sg or create a specific one
-}
+
 
 
 
