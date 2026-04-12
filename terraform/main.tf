@@ -97,12 +97,12 @@ resource "aws_ecr_repository" "api" {
 
 # The ECS Express Service (Replaces App Runner)
 resource "aws_ecs_express_gateway_service" "api" {
-  name                    = "hebrews-api"
+  service_name             = "hebrews-api"
   execution_role_arn       = aws_iam_role.ecs_execution_role.arn
   infrastructure_role_arn  = aws_iam_role.ecs_infrastructure_role.arn
   
   # Connects to your existing VPC subnets
-  subnet_ids         = [aws_subnet.public_a.id]
+  security_group_ids = [aws_subnet.public_a.id]
   security_group_ids = [aws_security_group.rds_sg.id] 
 
   primary_container {
