@@ -77,7 +77,7 @@ resource "aws_apprunner_service" "api" {
     }
     
     code_repository {
-      repository_url = "https://github.com"
+      repository_url = "https://github.com/hebrewElevenOne/hebrew.api"
       source_code_version {
         type  = "BRANCH"
         value = "main"
