@@ -2,7 +2,7 @@
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
-  tags = { Name = "sideline-vpc" }
+  tags = { Name = "hebrews-vpc" }
 }
 
 # Public Subnets (For App Runner/Internet access)
@@ -27,13 +27,13 @@ resource "aws_subnet" "private_b" {
 
 # DB Subnet Group (Tells RDS which subnets to use)
 resource "aws_db_subnet_group" "db_group" {
-  name       = "sideline-db-group"
+  name       = "hebrews-db-group"
   subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
 }
 
 # Security Group for RDS (Allows 5432 from App Runner only)
 resource "aws_security_group" "rds_sg" {
-  name   = "sideline-rds-sg"
+  name   = "hebrews-rds-sg"
   vpc_id = aws_vpc.main.id
 
   ingress {
@@ -45,7 +45,7 @@ resource "aws_security_group" "rds_sg" {
 }
 
 resource "aws_db_instance" "postgres" {
-  identifier           = "sideline-db"
+  identifier           = "hebrews-db"
   instance_class       = "db.t4g.micro"
   allocated_storage    = 20
   engine               = "postgres"
