@@ -49,7 +49,7 @@ resource "aws_db_instance" "postgres" {
   instance_class       = "db.t4g.micro"
   allocated_storage    = 20
   engine               = "postgres"
-  engine_version       = "16.2"
+  engine_version       = "16"
   username             = "adminuser"
   password             = var.db_password # We will set this in GitHub Secrets
   db_subnet_group_name = aws_db_subnet_group.db_group.name
@@ -60,7 +60,7 @@ resource "aws_db_instance" "postgres" {
 
 # IAM Role for Task Execution (Pulls the image from ECR)
 resource "aws_iam_role" "ecs_execution_role" {
-  name = "hebrew-api-execution-role"
+  name = "hebrews-api-execution-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
