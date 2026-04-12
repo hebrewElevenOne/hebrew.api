@@ -58,34 +58,6 @@ resource "aws_db_instance" "postgres" {
   skip_final_snapshot  = true
 }
 
-
-
-  # THIS block belongs here
-  source_configuration {
-    authentication_configuration {
-      # This is the ARN for your GitHub Connection in App Runner
-      connection_arn = var.app_runner_github_connection_arn 
-    }
-    
-    code_repository {
-      repository_url = "https://github.com/hebrewElevenOne/hebrew.api"
-      source_code_version {
-        type  = "BRANCH"
-        value = "main"
-      }
-      code_configuration {
-        configuration_source = "API"
-        code_configuration_values {
-          runtime = "DOTNET_8"
-          port    = "8080"
-          runtime_environment_variables = {
-            "ConnectionStrings__DefaultConnection" = "Host=${aws_db_instance.postgres.address};Port=5432;Database=${aws_db_instance.postgres.db_name};Username=adminuser;Password=${var.db_password};"
-          }
-        }
-      }
-    }
-  }
-
 # IAM Role for Task Execution (Pulls the image from ECR)
 resource "aws_iam_role" "ecs_execution_role" {
   name = "hebrew-api-execution-role"
