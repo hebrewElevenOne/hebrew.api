@@ -78,7 +78,7 @@ resource "aws_iam_role_policy_attachment" "execution_policy" {
 
 # IAM Role for Infrastructure (Manages the network/load balancer)
 resource "aws_iam_role" "ecs_infrastructure_role" {
-  name = "hebrew-api-infra-role"
+  name = "hebrews-api-infra-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
