@@ -58,15 +58,17 @@ resource "aws_db_instance" "postgres" {
   skip_final_snapshot  = true
 }
 
-# IAM Role for Task Execution (Pulls the image from ECR)
+# IAM Role for Task Execution
 resource "aws_iam_role" "ecs_execution_role" {
-  name = "hebrews-api-execution-role"
+  name = "hebrews-api-execution-role" # Changed to match your ECR name style
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
       Action = "sts:AssumeRole"
       Effect = "Allow"
-      Principal = { Service = "://amazonaws.com" } # Fixed principal
+      Principal = { 
+        Service = "://amazonaws.com" 
+      }
     }]
   })
 }
@@ -76,7 +78,7 @@ resource "aws_iam_role_policy_attachment" "execution_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# IAM Role for Infrastructure (Manages the network/load balancer)
+# IAM Role for Infrastructure
 resource "aws_iam_role" "ecs_infrastructure_role" {
   name = "hebrews-api-infra-role"
   assume_role_policy = jsonencode({
@@ -84,7 +86,9 @@ resource "aws_iam_role" "ecs_infrastructure_role" {
     Statement = [{
       Action = "sts:AssumeRole"
       Effect = "Allow"
-      Principal = { Service = "://amazonaws.com" } # Fixed principal
+      Principal = { 
+        Service = "://amazonaws.com" 
+      }
     }]
   })
 }
