@@ -59,18 +59,24 @@ resource "aws_db_instance" "postgres" {
 }
 
 # IAM Role for Task Execution
+# IAM Role for Task Execution
 resource "aws_iam_role" "ecs_execution_role" {
-  name = "hebrews-api-execution-role" # Changed to match your ECR name style
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = { 
-        Service = "://amazonaws.com" 
-      }
-    }]
-  })
+  name = "hebrews-api-execution-role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "://amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
 }
 
 resource "aws_iam_role_policy_attachment" "execution_policy" {
@@ -81,16 +87,21 @@ resource "aws_iam_role_policy_attachment" "execution_policy" {
 # IAM Role for Infrastructure
 resource "aws_iam_role" "ecs_infrastructure_role" {
   name = "hebrews-api-infra-role"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = { 
-        Service = "://amazonaws.com" 
-      }
-    }]
-  })
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "://amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
 }
 
 # ECR Repo to store your Docker images
