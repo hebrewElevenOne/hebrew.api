@@ -66,7 +66,7 @@ resource "aws_iam_role" "ecs_execution_role" {
     Statement = [{
       Action = "sts:AssumeRole"
       Effect = "Allow"
-      Principal = { Service = "://amazonaws.com" }
+      Principal = { Service = "://amazonaws.com" } # Fixed principal
     }]
   })
 }
@@ -84,20 +84,20 @@ resource "aws_iam_role" "ecs_infrastructure_role" {
     Statement = [{
       Action = "sts:AssumeRole"
       Effect = "Allow"
-      Principal = { Service = "://amazonaws.com" }
+      Principal = { Service = "://amazonaws.com" } # Fixed principal
     }]
   })
 }
 
 # ECR Repo to store your Docker images
 resource "aws_ecr_repository" "api" {
-  name                 = "hebrew-api"
+  name                 = "hebrews-api"
   force_delete         = true
 }
 
 # The ECS Express Service (Replaces App Runner)
 resource "aws_ecs_express_gateway_service" "api" {
-  name                    = "hebrew-api"
+  name                    = "hebrews-api"
   execution_role_arn       = aws_iam_role.ecs_execution_role.arn
   infrastructure_role_arn  = aws_iam_role.ecs_infrastructure_role.arn
   
