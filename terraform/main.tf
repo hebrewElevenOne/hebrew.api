@@ -103,4 +103,12 @@ resource "aws_apprunner_service" "api" {
   }
 }
 
+# Create the VPC Connector
+resource "aws_apprunner_vpc_connector" "connector" {
+  vpc_connector_name = "sideline-vpc-connector"
+  subnets            = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+  security_groups    = [aws_security_group.rds_sg.id] # Reuse rds_sg or create a specific one
+}
+
+
 
