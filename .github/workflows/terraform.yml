@@ -51,4 +51,6 @@ jobs:
         with:
           service-name: hebrews-api # Must match your main.tf service name
           image: ${{ steps.login-ecr.outputs.registry }}/hebrews-api:latest  
+          execution-role-arn: arn:aws:iam::497162053259:role/hebrews-api-execution-role
+          infrastructure-role-arn: arn:aws:iam::497162053259:role/hebrews-infrastructure-role
 
