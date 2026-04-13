@@ -43,10 +43,10 @@ resource "aws_db_instance" "postgres" {
   skip_final_snapshot  = true
 
   # Re-enabled these as they are best practices
-  maintenance_window         = "sun:03:00-sun:04:00"
-  auto_minor_version_upgrade = true
-  backup_window              = "01:00-02:00"
-  backup_retention_period    = 7
+  # maintenance_window         = "sun:03:00-sun:04:00"
+  # auto_minor_version_upgrade = true
+  # backup_window              = "01:00-02:00"
+  # backup_retention_period    = 7
 }
 
 # --- Security Groups ---
