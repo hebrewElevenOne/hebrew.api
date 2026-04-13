@@ -1,18 +1,9 @@
-# Create the VPC
+# --- VPC & Networking ---
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
-  tags = { Name = "hebrews-vpc" }
 }
 
-# Public Subnets (For App Runner/Internet access)
-resource "aws_subnet" "public_a" {
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "ap-southeast-1a"
-}
-
-# Private Subnets (For your Database)
 resource "aws_subnet" "private_a" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.2.0/24"
@@ -22,26 +13,18 @@ resource "aws_subnet" "private_a" {
 resource "aws_subnet" "private_b" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.3.0/24"
-  availability_zone = "ap-southeast-1b" # RDS needs two subnets in different zones
+  availability_zone = "ap-southeast-1b"
 }
 
-# DB Subnet Group (Tells RDS which subnets to use)
 resource "aws_db_subnet_group" "db_group" {
   name       = "hebrews-db-group"
   subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
 }
 
-# Security Group for RDS (Allows 5432 from App Runner only)
-resource "aws_security_group" "rds_sg" {
-  name   = "hebrews-rds-sg"
-  vpc_id = aws_vpc.main.id
-
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/16"] # Only allow traffic from within our VPC
-  }
+# --- Database ---
+resource "aws_db_parameter_group" "postgres16" {
+  name   = "hebrews-db-params"
+  family = "postgres16"
 }
 
 resource "aws_db_instance" "postgres" {
@@ -51,23 +34,35 @@ resource "aws_db_instance" "postgres" {
   engine               = "postgres"
   engine_version       = "16"
   username             = "adminuser"
-  password             = var.db_password # We will set this in GitHub Secrets
+  password             = var.db_password
   db_subnet_group_name = aws_db_subnet_group.db_group.name
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
+  parameter_group_name = aws_db_parameter_group.postgres16.name
+  
   publicly_accessible  = false
   skip_final_snapshot  = true
 
-  # Best Practices
-  # Maintenance: Sundays at 3:00 AM UTC
+  # Maintenance & Backups
   maintenance_window      = "sun:03:00-sun:04:00"
   auto_minor_version_upgrade = true
-
-  # Backups: Daily at 1:00 AM UTC (ensure no overlap)
   backup_window           = "01:00-02:00"
-  backup_retention_period = 7 # Required to enable automated backups
+  backup_retention_period = 7
 }
 
-# IAM Role for Task Execution
+# --- Security Groups ---
+resource "aws_security_group" "rds_sg" {
+  name   = "hebrews-rds-sg"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"] 
+  }
+}
+
+# --- IAM Roles ---
 resource "aws_iam_role" "ecs_execution_role" {
   name = "hebrews-api-execution-role" 
   assume_role_policy = jsonencode({
@@ -75,19 +70,16 @@ resource "aws_iam_role" "ecs_execution_role" {
     Statement = [{
       Action = "sts:AssumeRole",
       Effect = "Allow",
-      Principal = {
-        Service = "ecs-tasks.amazonaws.com"
-      }
+      Principal = { Service = "://amazonaws.com" }
     }]
   })
 }
 
 resource "aws_iam_role_policy_attachment" "execution_policy" {
   role       = aws_iam_role.ecs_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  policy_arn = "arn:aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# IAM Role for Infrastructure
 resource "aws_iam_role" "ecs_infrastructure_role" {
   name = "hebrews-infrastructure-role"
   assume_role_policy = jsonencode({
@@ -95,37 +87,48 @@ resource "aws_iam_role" "ecs_infrastructure_role" {
     Statement = [{
       Action = "sts:AssumeRole",
       Effect = "Allow",      
-      Principal = {
-        Service = "://amazonaws.com"
-      }
+      Principal = { Service = "://amazonaws.com" }
     }]
   })
 }
 
-# ECR Repo to store your Docker images
-resource "aws_ecr_repository" "api" {
-  name                 = "hebrews-api"
-  force_delete         = true
+# --- Logs & ECR ---
+resource "aws_cloudwatch_log_group" "api_logs" {
+  name              = "/ecs/hebrews-api"
+  retention_in_days = 7
 }
 
-# The ECS Express Service (Replaces App Runner)
+resource "aws_ecr_repository" "api" {
+  name         = "hebrews-api"
+  force_delete = true
+}
+
+# --- ECS Express Gateway Service ---
 resource "aws_ecs_express_gateway_service" "api" {
   service_name             = "hebrews-api"
   execution_role_arn       = aws_iam_role.ecs_execution_role.arn
   infrastructure_role_arn  = aws_iam_role.ecs_infrastructure_role.arn
   
+  # Adds a health check to ensure the ALB knows when your app is ready
+  health_check_path = "/health" 
+
   primary_container {
     image          = "${aws_ecr_repository.api.repository_url}:latest"
     container_port = 8080
     
+    # Integrated CloudWatch Logging
+    log_configuration {
+      log_driver = "awslogs"
+      options = {
+        "awslogs-group"         = aws_cloudwatch_log_group.api_logs.name
+        "awslogs-region"        = "ap-southeast-1"
+        "awslogs-stream-prefix" = "ecs"
+      }
+    }
+
     environment {
       name  = "ConnectionStrings__DefaultConnection"
-      value = "Host=${aws_db_instance.postgres.address};Port=5432;Database=${aws_db_instance.postgres.db_name};Username=adminuser;Password=${var.db_password};"
+      value = "Host=${aws_db_instance.postgres.address};Port=5432;Database=postgres;Username=adminuser;Password=${var.db_password};"
     }
   }
 }
-
-
-
-
-
