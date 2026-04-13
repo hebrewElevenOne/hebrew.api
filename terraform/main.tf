@@ -93,7 +93,7 @@ resource "aws_iam_role" "ecs_infrastructure_role" {
       Action = "sts:AssumeRole",
       Effect = "Allow",      
       Principal = { 
-        Service = "delivery.ecs.amazonaws.com" 
+        Service = "ecs.amazonaws.com" 
       }
     }]
   })
