@@ -91,18 +91,16 @@ resource "aws_iam_role" "ecs_infrastructure_role" {
       Action = "sts:AssumeRole",
       Effect = "Allow",      
       Principal = { 
-        Service = [
-          "://amazonaws.com", 
-          "delivery.://amazonaws.com" # FIXED
-        ] 
+        Service = "delivery.ecs.amazonaws.com" 
       }
     }]
   })
 }
 
+# REQUIRED: Policy attachment for Express Mode infrastructure management
 resource "aws_iam_role_policy_attachment" "infrastructure_policy" {
   role       = aws_iam_role.ecs_infrastructure_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSInfrastructureRolePolicyForService" # REQUIRED FOR EXPRESS
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSInfrastructureRolePolicyForExpressGatewayServices" 
 }
 
 # --- Logs & ECR ---
