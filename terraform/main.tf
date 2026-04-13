@@ -62,12 +62,12 @@ resource "aws_db_instance" "postgres" {
 resource "aws_iam_role" "ecs_execution_role" {
   name = "hebrews-api-execution-role" 
   assume_role_policy = jsonencode({
-    Version: "2012-10-17",
-    Statement: [{
-      Action: "sts:AssumeRole",
-      Effect: "Allow",
-      Principal: {
-        Service: "://amazonaws.com"
+    Version = "2012-10-17",
+    Statement = [{
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
+      Principal = {
+        Service = "://amazonaws.com"
       }
     }]
   })
@@ -82,12 +82,12 @@ resource "aws_iam_role_policy_attachment" "execution_policy" {
 resource "aws_iam_role" "ecs_infrastructure_role" {
   name = "hebrews-infrastructure-role"
   assume_role_policy = jsonencode({
-    Version: "2012-10-17",
-    Statement: [{
-      Effect: "Allow",
-      Action: "sts:AssumeRole",
-      Principal: {
-        Service: "://amazonaws.com"
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Action = "sts:AssumeRole",
+      Principal = {
+        Service = "://amazonaws.com"
       }
     }]
   })
