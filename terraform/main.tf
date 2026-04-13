@@ -136,4 +136,12 @@ resource "aws_ecs_express_gateway_service" "api" {
     }
   }
 }
+output "execution_role_arn" {
+  value = aws_iam_role.ecs_execution_role.arn
+}
+
+output "infrastructure_role_arn" {
+  value = aws_iam_role.ecs_infrastructure_role.arn
+}
+
 
