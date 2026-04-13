@@ -43,10 +43,10 @@ resource "aws_db_instance" "postgres" {
   skip_final_snapshot  = true
 
   # Maintenance & Backups
-  maintenance_window      = "sun:03:00-sun:04:00"
-  auto_minor_version_upgrade = true
-  backup_window           = "01:00-02:00"
-  backup_retention_period = 7
+  # maintenance_window      = "sun:03:00-sun:04:00"
+  # auto_minor_version_upgrade = true
+  # backup_window           = "01:00-02:00"
+  # backup_retention_period = 7
 }
 
 # --- Security Groups ---
@@ -75,10 +75,9 @@ resource "aws_iam_role" "ecs_execution_role" {
   })
 }
 
-# --- Corrected IAM Policy Attachment ---
+# --- IAM Policy Attachment ---
 resource "aws_iam_role_policy_attachment" "execution_policy" {
   role       = aws_iam_role.ecs_execution_role.name
-  # FIXED: Added "iam::" to the ARN
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
