@@ -56,6 +56,15 @@ resource "aws_db_instance" "postgres" {
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
   publicly_accessible  = false
   skip_final_snapshot  = true
+
+  # Best Practices
+  # Maintenance: Sundays at 3:00 AM UTC
+  maintenance_window      = "sun:03:00-sun:04:00"
+  auto_minor_version_upgrade = true
+
+  # Backups: Daily at 1:00 AM UTC (ensure no overlap)
+  backup_window           = "01:00-02:00"
+  backup_retention_period = 7 # Required to enable automated backups
 }
 
 # IAM Role for Task Execution
