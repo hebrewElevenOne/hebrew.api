@@ -112,6 +112,7 @@ resource "aws_ecr_repository" "api" {
 }
 
 # --- ECS Express Service ---
+# --- ECS Express Service ---
 resource "aws_ecs_express_gateway_service" "api" {
   service_name             = "hebrews-api"
   execution_role_arn       = aws_iam_role.ecs_execution_role.arn
@@ -123,8 +124,10 @@ resource "aws_ecs_express_gateway_service" "api" {
     image          = "${aws_ecr_repository.api.repository_url}:latest"
     container_port = 8080
     
-    aws_logs_configuration { # FIXED
-      log_group = aws_cloudwatch_log_group.api_logs.name
+    aws_logs_configuration { 
+      log_group         = aws_cloudwatch_log_group.api_logs.name
+      # FIXED: Added the required log_stream_prefix field
+      log_stream_prefix = "hebrews-api" 
     }
 
     environment {
@@ -133,3 +136,4 @@ resource "aws_ecs_express_gateway_service" "api" {
     }
   }
 }
+
