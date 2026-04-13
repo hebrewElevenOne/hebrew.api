@@ -60,7 +60,7 @@ resource "aws_db_instance" "postgres" {
 
 # IAM Role for Task Execution
 resource "aws_iam_role" "ecs_execution_role" {
-  name = "HebrewApiDeployRole" 
+  name = "hebrews-api-execution-role" 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -80,7 +80,7 @@ resource "aws_iam_role_policy_attachment" "execution_policy" {
 
 # IAM Role for Infrastructure
 resource "aws_iam_role" "ecs_infrastructure_role" {
-  name = "HebrewApiDeployRole"
+  name = "hebrews-infrastructure-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
