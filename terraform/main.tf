@@ -41,6 +41,7 @@ resource "aws_db_instance" "postgres" {
   
   publicly_accessible  = false
   skip_final_snapshot  = true
+  deletion_protection = true
 
   # Re-enabled these as they are best practices
   # maintenance_window         = "sun:03:00-sun:04:00"
