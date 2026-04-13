@@ -99,11 +99,6 @@ resource "aws_iam_role" "ecs_infrastructure_role" {
   })
 }
 
-# REQUIRED: Policy attachment for Express Mode infrastructure management
-resource "aws_iam_role_policy_attachment" "infrastructure_policy" {
-  role       = aws_iam_role.ecs_infrastructure_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSInfrastructureRolePolicyForExpressGatewayServices" 
-}
 
 # --- Logs & ECR ---
 resource "aws_cloudwatch_log_group" "api_logs" {
