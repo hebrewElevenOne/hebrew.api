@@ -75,9 +75,11 @@ resource "aws_iam_role" "ecs_execution_role" {
   })
 }
 
+# --- Corrected IAM Policy Attachment ---
 resource "aws_iam_role_policy_attachment" "execution_policy" {
   role       = aws_iam_role.ecs_execution_role.name
-  policy_arn = "arn:aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  # FIXED: Added "iam::" to the ARN
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
 resource "aws_iam_role" "ecs_infrastructure_role" {
@@ -103,27 +105,22 @@ resource "aws_ecr_repository" "api" {
   force_delete = true
 }
 
-# --- ECS Express Gateway Service ---
+# --- Corrected ECS Service ---
 resource "aws_ecs_express_gateway_service" "api" {
   service_name             = "hebrews-api"
   execution_role_arn       = aws_iam_role.ecs_execution_role.arn
   infrastructure_role_arn  = aws_iam_role.ecs_infrastructure_role.arn
   
-  # Adds a health check to ensure the ALB knows when your app is ready
+  # Optional: Express gateway defaults this to "/ping" if not specified
   health_check_path = "/health" 
 
   primary_container {
     image          = "${aws_ecr_repository.api.repository_url}:latest"
     container_port = 8080
     
-    # Integrated CloudWatch Logging
-    log_configuration {
-      log_driver = "awslogs"
-      options = {
-        "awslogs-group"         = aws_cloudwatch_log_group.api_logs.name
-        "awslogs-region"        = "ap-southeast-1"
-        "awslogs-stream-prefix" = "ecs"
-      }
+    # FIXED: Used "aws_logs_configuration" block with "log_group" argument
+    aws_logs_configuration {
+      log_group = aws_cloudwatch_log_group.api_logs.name
     }
 
     environment {
