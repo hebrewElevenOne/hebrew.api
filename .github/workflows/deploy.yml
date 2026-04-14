@@ -5,8 +5,8 @@ on:
   #  branches: [ "main" ]
 
 env:
-  AWS_REGION: us-east-1                   # Change to your region
-  ECR_REPOSITORY: my-api-repo             # Your ECR repo name
+  AWS_REGION:  ap-southeast-1 # Philippines/Singapore region
+  ECR_REPOSITORY: hebrews-api             # Your ECR repo name
   TF_WORKING_DIR: ./terraform/app         # Where your App Terraform lives
 
 jobs:
