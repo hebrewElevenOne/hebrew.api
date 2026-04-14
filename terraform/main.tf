@@ -122,7 +122,7 @@ resource "aws_ecs_express_gateway_service" "api" {
   health_check_path = "/health" 
 
   primary_container {
-    image          = "${aws_ecr_repository.api.repository_url}:latest"
+    image          = "${aws_ecr_repository.api.repository_url}:${var.image_tag}"
     container_port = 8080
     
     aws_logs_configuration { 
