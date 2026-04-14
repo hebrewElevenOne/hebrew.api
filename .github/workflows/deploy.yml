@@ -7,7 +7,7 @@ on:
 env:
   AWS_REGION:  ap-southeast-1 # Philippines/Singapore region
   ECR_REPOSITORY: hebrews-api             # Your ECR repo name
-  TF_WORKING_DIR: ./terraform/app         # Where your App Terraform lives
+  TF_WORKING_DIR: ./terraform         # Where your App Terraform lives
 
 jobs:
   deploy:
