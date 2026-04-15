@@ -4,6 +4,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHealthChecks();
 
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer(); // Required for discovering endpoints
+builder.Services.AddSwaggerGen(); // Adds the Swagger generator
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -15,6 +18,8 @@ app.MapHealthChecks("/health");
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger(); // Serves the documentation as a JSON endpoint
+    app.UseSwaggerUI(); // Serves the visual UI
 }
 
 app.UseHttpsRedirection();
