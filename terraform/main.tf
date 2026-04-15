@@ -113,7 +113,6 @@ resource "aws_ecr_repository" "api" {
 }
 
 # --- ECS Express Service ---
-# --- ECS Express Service ---
 resource "aws_ecs_express_gateway_service" "api" {
   service_name             = "hebrews-api"
   execution_role_arn       = aws_iam_role.ecs_execution_role.arn
@@ -134,6 +133,11 @@ resource "aws_ecs_express_gateway_service" "api" {
     environment {
       name  = "ConnectionStrings__DefaultConnection"
       value = "Host=${aws_db_instance.postgres.address};Port=5432;Database=postgres;Username=adminuser;Password=${var.db_password};"
+    }
+
+    environment {
+      name  = "ASPNETCORE_ENVIRONMENT"
+      value = var.app_environment
     }
   }
 }
