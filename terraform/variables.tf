@@ -9,3 +9,9 @@ variable "image_tag" {
   type        = string
   default     = "latest" # Optional: provides a fallback if no tag is provided
 }
+
+variable "app_environment" {
+  description = "The environment for the .NET application (e.g., Development, Production)"
+  type        = string
+  default     = "Development"
+}
