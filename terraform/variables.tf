@@ -15,3 +15,13 @@ variable "app_environment" {
   type        = string
   default     = "Production"
 }
+
+variable "swagger_username" {
+  description = "The environment for the .NET application (e.g., Development, Production)"
+  type        = string
+}
+
+variable "swagger_password" {
+  description = "The environment for the .NET application (e.g., Development, Production)"
+  type        = string
+}
