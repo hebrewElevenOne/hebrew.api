@@ -17,7 +17,7 @@ if (app.Environment.IsDevelopment())
 {
     app.Use(async (context, next) =>
     {
-        if (context.Request.Path.StartsWithSegments("/swagger"))
+        if (context.Request.Path.HasValue && context.Request.Path.Value.Contains("/swagger", StringComparison.OrdinalIgnoreCase))
         {
             string authHeader = context.Request.Headers["Authorization"];
     
@@ -39,6 +39,9 @@ if (app.Environment.IsDevelopment())
     
             context.Response.Headers["WWW-Authenticate"] = "Basic";
             context.Response.StatusCode = 401;
+
+             // 3. Optional: Add a small body so users don't see a blank page if they hit cancel
+            await context.Response.WriteAsync("Unauthorized. Please provide credentials to access Swagger UI.");
         }
         else
         {
