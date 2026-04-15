@@ -11,37 +11,39 @@ builder.Services.AddSwaggerGen(); // Adds the Swagger generator
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
-app.Use(async (context, next) =>
+if (app.Environment.IsDevelopment())
 {
-    if (context.Request.Path.StartsWithSegments("/swagger"))
+    app.Use(async (context, next) =>
     {
-        string authHeader = context.Request.Headers["Authorization"];
-
-        if (authHeader != null && authHeader.StartsWith("Basic "))
+        if (context.Request.Path.StartsWithSegments("/swagger"))
         {
-            var encodedCredentials = authHeader.Substring(6).Trim();
-            var credentials = Encoding.UTF8.GetString(Convert.FromBase64String(encodedCredentials)).Split(':');
-            
-            // GET FROM ENVIRONMENT VARIABLES
-            var envUser = Environment.GetEnvironmentVariable("SWAGGER_USER");
-            var envPass = Environment.GetEnvironmentVariable("SWAGGER_PASS");
-
-            if (credentials[0] == envUser && credentials[1] == envPass)
+            string authHeader = context.Request.Headers["Authorization"];
+    
+            if (authHeader != null && authHeader.StartsWith("Basic "))
             {
-                await next();
-                return;
+                var encodedCredentials = authHeader.Substring(6).Trim();
+                var credentials = Encoding.UTF8.GetString(Convert.FromBase64String(encodedCredentials)).Split(':');
+                
+                // GET FROM ENVIRONMENT VARIABLES
+                var envUser = Environment.GetEnvironmentVariable("SWAGGER_USER");
+                var envPass = Environment.GetEnvironmentVariable("SWAGGER_PASS");
+    
+                if (credentials[0] == envUser && credentials[1] == envPass)
+                {
+                    await next();
+                    return;
+                }
             }
+    
+            context.Response.Headers["WWW-Authenticate"] = "Basic";
+            context.Response.StatusCode = 401;
         }
-
-        context.Response.Headers["WWW-Authenticate"] = "Basic";
-        context.Response.StatusCode = 401;
-    }
-    else
-    {
-        await next();
-    }
-});
-
+        else
+        {
+            await next();
+        }
+    });
+}
 app.MapHealthChecks("/health");
 
 // Configure the HTTP request pipeline.
