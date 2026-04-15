@@ -17,11 +17,11 @@ variable "app_environment" {
 }
 
 variable "swagger_username" {
-  description = "The environment for the .NET application (e.g., Development, Production)"
+  description = "username for basic auth"
   type        = string
 }
 
 variable "swagger_password" {
-  description = "The environment for the .NET application (e.g., Development, Production)"
+  description =  "password for basic auth"
   type        = string
 }
