@@ -13,5 +13,5 @@ variable "image_tag" {
 variable "app_environment" {
   description = "The environment for the .NET application (e.g., Development, Production)"
   type        = string
-  default     = "Development"
+  default     = "Production"
 }
