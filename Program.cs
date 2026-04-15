@@ -18,14 +18,15 @@ app.MapHealthChecks("/health");
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseSwagger(); // Serves the documentation as a JSON endpoint
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-        options.RoutePrefix = string.Empty; // This makes Swagger the root of the site
-    });
 }
+
+app.UseSwagger(); // Serves the documentation as a JSON endpoint
+app.UseSwagger();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    options.RoutePrefix = string.Empty; // This makes Swagger the root of the site
+});
 
 app.UseHttpsRedirection();
 
