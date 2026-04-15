@@ -139,6 +139,17 @@ resource "aws_ecs_express_gateway_service" "api" {
       name  = "ASPNETCORE_ENVIRONMENT"
       value = var.app_environment
     }
+
+    environment {
+      name  = "SWAGGER_USER"
+      value = var.swagger_username
+    }
+
+    environment {
+      name  = "SWAGGER_PASS"
+      value = var.swagger_password
+    }
+
   }
 }
 output "execution_role_arn" {
