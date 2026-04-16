@@ -34,6 +34,7 @@ jobs:
             -var="image_tag=${{ github.sha }}" \
             -var="swagger_username=${{ secrets.SWAGGER_USERNAME }}" \
             -var="swagger_password=${{ secrets.SWAGGER_PASSWORD }}" \
+            -replace="aws_ecs_express_gateway_service.api" \
             -auto-approve
         env:
           TF_VAR_db_password: ${{ secrets.RDS_PASSWORD }} 
