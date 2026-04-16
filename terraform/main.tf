@@ -1,6 +1,6 @@
 import {
   to = aws_ecs_express_gateway_service.api
-  id = "default/hebrews-api"
+  id = "hebrews-api"
 }
 
 
