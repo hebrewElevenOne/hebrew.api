@@ -1,9 +1,3 @@
-import {
-  to = aws_ecs_express_gateway_service.api
-  id = "arn:aws:ecs:ap-southeast-1:497162053259:service/default/hebrews-api"
-}
-
-
 # --- VPC & Networking ---
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
