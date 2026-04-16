@@ -1,4 +1,4 @@
-name: Deploy to Amazon ECS
+name: Deploy API
 on:
   workflow_dispatch:
   # push:
